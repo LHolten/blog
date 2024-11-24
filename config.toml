@@ -1,0 +1,58 @@
+# The URL the site will be built for
+base_url = "https://blog.lucasholten.com"
+
+description = "This is where I will be blogging about my projects!"
+
+# Whether to automatically compile all Sass files in the sass directory
+compile_sass = false
+
+# Whether to build a search index to be used later on by a JavaScript library
+build_search_index = false
+
+theme = "kangae"
+
+taxonomies = [
+  { name = "tags" },
+]
+
+default_language = "en"
+
+generate_feed = true
+
+[markdown]
+highlight_code = true
+extra_syntaxes_and_themes = ["highlight_themes/gruvbox"]
+highlight_theme = "gruvbox-dark"
+
+
+[extra]
+author = "Lucas Holten"
+username = "LHolten"
+keywords = [ "rust", "database" ]
+
+navbar = [
+  { name = "github", url = "https://github.com/LHolten", rel="me" },
+  { name = "mastodon", url = "https://qoto.org/@LHolten", rel="me" },
+]
+
+[extra.content_license]
+# [recommended] the spdx identifier of the license of content on your microblog
+spdx = "CC-BY-NC-ND-4.0"
+
+# [recommended] the url of the license
+url = "https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode.txt"
+
+[extra.source_license]
+# [recommended] the spdx identifier for the license of source code on your microblog
+spdx = "0BSD"
+
+# [recommended] the url of the license
+url = "https://spdx.org/licenses/0BSD.html"
+
+# [recommended] the url of the source code of the microblog itself
+src_url = "https://github.com/LHolten/blog"
+
+[extra.post_footer]
+
+# [recommended] show a permalink to microblog posts
+share = true

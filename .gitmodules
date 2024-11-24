@@ -1,0 +1,6 @@
+[submodule "themes/kangae"]
+	path = themes/kangae
+	url = https://github.com/ayushnix/kangae.git
+[submodule "highlight_themes/gruvbox"]
+	path = highlight_themes/gruvbox
+	url = https://github.com/subnut/gruvbox-tmTheme.git
