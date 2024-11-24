@@ -37,7 +37,7 @@ It seems like there are two schools of thought in the design of database librari
 I could write a blog post about each one of these, but lets keep it short for now:
 
 - **Explicit table aliasing**: Joining a table gives back a dummy representing that table `let user = User::join(rows);`.
-- **Null safety**: Optional values have `Option` type, requiring special care to handle.
+- **Null safety**: Optional values in queries have `Option` type, requiring special care to handle.
 - **Row references tied to transaction lifetime**: References can only be used while the row is guaranteed to exist.
 - **Encapsulated typed row IDs**: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.
 - **Intuitive aggregates**: Our aggregates are guaranteed to give a single result for every row they're joined on. After trying it, you'll see this is much more intuitive than traditional GROUP BY operations.
@@ -72,6 +72,7 @@ enum Schema {
 use v0::*;
 ```
 
+Schema defintions in `rust-query` use enum syntax, but no actual enum is defined here.
 This schema defines three tables with specified columns and relationships:
 - Using another table name as a column type creates a foreign key constraint.
 - The `#[unique]` attribute creates named unique constraints.
@@ -188,7 +189,7 @@ let m = m.migrate(v1::update::Schema {
 
 While still in development, the library already allows building experimental database-backed applications in Rust. I encourage you to try it out and provide feedback through GitHub[^github] issues!
 
-> The library currently uses SQLite as its backend, chosen for its embedded nature. This allows you to get started quickly without setting up a separate database server.
+> The library currently uses SQLite as its only backend, chosen for its embedded nature. This will not change anytime soon, as one backend is most practical while `rust-query` is in development.
 
 [^crate]: <https://crates.io/crates/rust-query>
 
