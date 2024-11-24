@@ -38,14 +38,14 @@ I could write a blog post about each one of these, but lets keep it short for no
 
 - **Explicit table aliasing**: Joining a table gives back a dummy representing that table `let user = User::join(rows);`.
 - **Null safety**: Optional values in queries have `Option` type, requiring special care to handle.
-- **Row references tied to transaction lifetime**: References can only be used while the row is guaranteed to exist.
-- **Encapsulated typed row IDs**: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.
 - **Intuitive aggregates**: Our aggregates are guaranteed to give a single result for every row they're joined on. After trying it, you'll see this is much more intuitive than traditional GROUP BY operations.
 - **Type-safe foreign key navigation**: Database constraints are like type signatures, so you can rely on them for your queries with easy-to-use implicit joins by foreign key (e.g., `track.album().artist().name()`).
 - **Type-safe unique lookups**: For example, you can get a an `Option<Rating>` dummy with `Rating::unique(my_user, my_story)`.
 - **Multi-versioned schema**: It's declarative and you can see the differences between all past versions of the schema at once!
 - **Type-safe migrations**: Migrations have all the power of queries and can use arbitrary Rust code to process rows. Ever had to consult something outside the database for use in a migration? Now you can!
 - **Type-safe unique conflicts**: Inserting and updating rows in tables with unique constraints results in specialized error types.
+- **Row references tied to transaction lifetime**: References can only be used while the row is guaranteed to exist.
+- **Encapsulated typed row IDs**: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.
 
 ## Lets see it!
 
@@ -137,11 +137,10 @@ fn query_data(txn: &Transaction<Schema>) {
 Key points about queries:
 - `rows` represents the current set of rows in the query.
 - Joins can add rows and filters can remove rows. <details>By joining a table like `Story`, the `rows` set is mutated to be the Cartesian product of itself and the rows from the joined table. The query above only has a single `join`, so we know it will give exactly one result for each row in the `Story` table.</details> 
-- Column dummies like `story` refer to joined tables.
-- Results can be collected into vectors of tuples or structs.
 - Using `aggregate` to calculate an aggregate, does not change the number of rows in the query.
 - `rows.filter_on` can be used to filter rows in the aggregate to match a value from the outer scope.
 - The `rows.avg` method returns the average of the rows in the aggregate, if there are no rows then the average will evaluate to `None`.
+- Results can be collected into vectors of tuples or structs.
 
 ### Schema Evolution and Migrations
 
@@ -175,7 +174,7 @@ let m = m.migrate(v1::update::Schema {
 });
 ```
 
-- The `v1::update` module contains `struct`s defining the difference between schema `v0` and schema `v1`.
+- The `v1::update` module contains structs defining the difference between schema `v0` and schema `v1`.
 - We use these structs to implement the migration. This way the migration is type checked against both the old and new schemas.
 - Note that inside migrations we can execute all single-row queries we want: aggregates, unique constraint lookups etc!
 - We can also use `map_dummy` with arbitrary rust to process rows further.
