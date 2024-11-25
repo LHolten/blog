@@ -7,7 +7,7 @@ tags = [ "database", "rust" ]
 +++
 # Safe relational database queries using the Rust type system
 
-Do you want to persist your data safely without migration issues and easily write complicated queries? All of this without writing a single line of SQL? If so, then I am making `rust-query` for you!
+Do you want to persist your data safely without migration issues and easily write complicated queries? All of this without writing a single line of SQL? If so, then [I am making `rust-query`](https://github.com/LHolten/rust-query) for you!
 
 > This is my first blog post about `rust-query`, a project I've been working on for many months. I hope you like it!
 
