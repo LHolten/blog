@@ -1,5 +1,5 @@
 +++
-title = "Anouncing rust-query"
+title = "Announcing rust-query"
 date = "2024-11-24"
 description = "New database library for rust"
 [taxonomies]
@@ -23,11 +23,6 @@ For those who don't know, SQL is **the** standard when it comes to interacting w
 
 My opinion is that SQL should be for computers to write. This would put it firmly in the same category as LLVM IR. The fact that it is human-readable is useful for debugging and testing, but I don't think it's how you want to write queries.
 
-It seems like there are two schools of thought in the design of database libraries:
-- The wrappers that require you to write SQL directly. Especially `sqlx` is an interesting one, because it can ask the database to validate SQL and give back type information.
-- Wrappers that don't require you to write SQL. There is so much potential here, but I think it has been under-explored. Diesel is a bit of an edge case that tries to stay close to SQL syntax, even adopting SQL's column scoping rules – which in my opinion is one of the worst parts of SQL.
-
-
 # Introducing `rust-query`
 
 `rust-query`[^crate] is my answer to relational database queries in Rust. It's an opinionated library that deeply integrates with Rust's type system to make database operations feel Rust native.
@@ -44,7 +39,7 @@ I could write a blog post about each one of these, but lets keep it short for no
 - **Multi-versioned schema**: It's declarative and you can see the differences between all past versions of the schema at once!
 - **Type-safe migrations**: Migrations have all the power of queries and can use arbitrary Rust code to process rows. Ever had to consult something outside the database for use in a migration? Now you can!
 - **Type-safe unique conflicts**: Inserting and updating rows in tables with unique constraints results in specialized error types.
-- **Row references tied to transaction lifetime**: References can only be used while the row is guaranteed to exist.
+- **Row references tied to transaction lifetime**: Row references can only be used while the row is guaranteed to exist.
 - **Encapsulated typed row IDs**: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.
 
 ## Lets see it!
@@ -76,7 +71,7 @@ Schema defintions in `rust-query` use enum syntax, but no actual enum is defined
 This schema defines three tables with specified columns and relationships:
 - Using another table name as a column type creates a foreign key constraint.
 - The `#[unique]` attribute creates named unique constraints.
-- The `#[schema]` macro generates a module `v0` that contains the database API.
+- The `#[schema]` macro parses the enum syntax and generates a module `v0` that contains the database API.
 
 ### Writing Queries
 
