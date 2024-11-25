@@ -1,0 +1,10 @@
+/* modus vivendi colorscheme */
+
+:root {
+  --fg-color: #e0e6f0;
+  --bg-color: #323232;
+  --fg-href: #f2e4c4;
+  --fg-border: #969696;
+  --bg-mark: #dfdfb0;
+  --fg-mark: #100f10;
+}
