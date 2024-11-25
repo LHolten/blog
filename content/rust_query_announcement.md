@@ -1,7 +1,7 @@
 +++
 title = "Announcing rust-query"
 date = "2024-11-24"
-description = "New database library for rust"
+description = "New database library for Rust"
 [taxonomies]
 tags = [ "database", "rust" ]
 +++
@@ -11,13 +11,13 @@ Do you want to persist your data safely without migration issues and easily writ
 
 > This is my first blog post about `rust-query`, a project I've been working on for many months. I hope you like it!
 
-### Rust and databases
+### Rust and Databases
 
-There is only one reason why I made this library and it is because I don't like the current options for interacting with a database from rust. The existing libraries don't provide the compile time guarantees that I want and are verbose or awkward like SQL.
+There is only one reason why I made this library and it is because I don't like the current options for interacting with a database from Rust. The existing libraries don't provide the compile time guarantees that I want and are verbose or awkward like SQL.
 
-The reason I care so much is that databases are really cool. They solve a huge problem of making crash resistant software with support for atomic transactions.
+The reason I care so much is that databases are really cool. They solve a huge problem of making crash-resistant software with support for atomic transactions.
 
-## Structured query language (SQL) is a protocol
+## Structured Query Language (SQL) is a protocol
 
 For those who don't know, SQL is **the** standard when it comes to interacting with databases. So much so that almost all databases only accept queries in some dialect of SQL.
 
@@ -25,24 +25,24 @@ My opinion is that SQL should be for computers to write. This would put it firml
 
 # Introducing `rust-query`
 
-`rust-query`[^crate] is my answer to relational database queries in Rust. It's an opinionated library that deeply integrates with Rust's type system to make database operations feel Rust native.
+[`rust-query`](https://crates.io/crates/rust-query) is my answer to relational database queries in Rust. It's an opinionated library that deeply integrates with Rust's type system to make database operations feel Rust-native.
 
 ## Key Features and Design Decisions
 
-I could write a blog post about each one of these, but lets keep it short for now:
+I could write a blog post about each one of these, but let's keep it short for now:
 
 - **Explicit table aliasing**: Joining a table gives back a dummy representing that table `let user = User::join(rows);`.
 - **Null safety**: Optional values in queries have `Option` type, requiring special care to handle.
-- **Intuitive aggregates**: Our aggregates are guaranteed to give a single result for every row they're joined on. After trying it, you'll see this is much more intuitive than traditional GROUP BY operations.
+- **Intuitive aggregates**: Our aggregates are guaranteed to give a single result for every row they're joined on. After trying it, you'll see this is much more intuitive than traditional `GROUP BY` operations.
 - **Type-safe foreign key navigation**: Database constraints are like type signatures, so you can rely on them for your queries with easy-to-use implicit joins by foreign key (e.g., `track.album().artist().name()`).
-- **Type-safe unique lookups**: For example, you can get a an `Option<Rating>` dummy with `Rating::unique(my_user, my_story)`.
+- **Type-safe unique lookups**: For example, you can get an `Option<Rating>` dummy with `Rating::unique(my_user, my_story)`.
 - **Multi-versioned schema**: It's declarative and you can see the differences between all past versions of the schema at once!
 - **Type-safe migrations**: Migrations have all the power of queries and can use arbitrary Rust code to process rows. Ever had to consult something outside the database for use in a migration? Now you can!
 - **Type-safe unique conflicts**: Inserting and updating rows in tables with unique constraints results in specialized error types.
 - **Row references tied to transaction lifetime**: Row references can only be used while the row is guaranteed to exist.
 - **Encapsulated typed row IDs**: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.
 
-## Lets see it!
+## Let's see it!
 
 You always start by defining a schema. With `rust-query` it's easy to migrate to a different schema later.
 
@@ -91,7 +91,7 @@ fn insert_data(txn: &mut TransactionMut<Schema>) {
     let dream = txn.insert(Story {
         author: alice,
         title: "My crazy dream",
-        content: "A dinosaur and a bird..."
+        content: "A dinosaur and a bird...",
     });
     
     // Insert a rating - note the try_insert due to the unique constraint
@@ -171,8 +171,8 @@ let m = m.migrate(v1::update::Schema {
 
 - The `v1::update` module contains structs defining the difference between schema `v0` and schema `v1`.
 - We use these structs to implement the migration. This way the migration is type checked against both the old and new schemas.
-- Note that inside migrations we can execute all single-row queries we want: aggregates, unique constraint lookups etc!
-- We can also use `map_dummy` with arbitrary rust to process rows further.
+- Note that inside migrations we can execute all the single-row queries we want: aggregates, unique constraint lookups etc.!
+- We can also use `map_dummy` with arbitrary Rust to process rows further.
 
 ## Conclusion
 
@@ -181,10 +181,6 @@ let m = m.migrate(v1::update::Schema {
 - Making it possible to compose queries with each other and arbitrary Rust.
 - Enabling schema evolution with type-checked migrations.
 
-While still in development, the library already allows building experimental database-backed applications in Rust. I encourage you to try it out and provide feedback through GitHub[^github] issues!
+While still in development, the library already allows building experimental database-backed applications in Rust. I encourage you to try it out and provide feedback through [GitHub](https://github.com/LHolten/rust-query) issues!
 
 > The library currently uses SQLite as its only backend, chosen for its embedded nature. This will not change anytime soon, as one backend is most practical while `rust-query` is in development.
-
-[^crate]: <https://crates.io/crates/rust-query>
-
-[^github]: <https://github.com/LHolten/rust-query>

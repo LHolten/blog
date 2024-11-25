@@ -30,6 +30,8 @@ author = "Lucas Holten"
 username = "LHolten"
 keywords = [ "rust", "database" ]
 
+custom_css = "css/custom.css"
+
 navbar = [
   # { name = "github", url = "https://github.com/LHolten", rel="me" },
   { name = "mastodon", url = "https://qoto.org/@LHolten", rel="me" },
