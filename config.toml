@@ -31,7 +31,7 @@ username = "LHolten"
 keywords = [ "rust", "database" ]
 
 navbar = [
-  { name = "github", url = "https://github.com/LHolten", rel="me" },
+  # { name = "github", url = "https://github.com/LHolten", rel="me" },
   { name = "mastodon", url = "https://qoto.org/@LHolten", rel="me" },
 ]
 
