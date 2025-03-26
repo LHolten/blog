@@ -1,0 +1,360 @@
+/*@import url("variables-light-theme.css") (prefers-color-scheme: light);*/
+/*@import url("variables-dark-theme.css") (prefers-color-scheme: dark);*/
+:root {
+  --fg-color: #e0e6f0;
+  --bg-color: #323232;
+  --fg-href: #f2e4c4;
+  --fg-border: #969696;
+  --bg-mark: #dfdfb0;
+  --fg-mark: #100f10;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --fg-color: #282828;
+    --bg-color: #f8f8f8;
+    --fg-href: #0000c0;
+    /* deliberaty choose a color with a lesser contrast */
+    /* APCA contrast value of 83.77 against bg-color */
+    --fg-border: #505050;
+    --bg-mark: #f9ff00;
+    --fg-mark: #282828;
+  }
+}
+
+:root {
+  --sans-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --mono-font: ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Inconsolata, monospace;
+
+  /* @link https://utopia.fyi/type/calculator?c=320,14,1.125,1280,18,1.25,4,5,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l */
+  --step-s5: clamp(0.37rem, calc(0.52rem + -0.19vw), 0.49rem);
+  --step-s4: clamp(0.46rem, calc(0.57rem + -0.14vw), 0.55rem);
+  --step-s3: clamp(0.58rem, calc(0.63rem + -0.06vw), 0.61rem);
+  --step-s2: clamp(0.69rem, calc(0.68rem + 0.05vw), 0.72rem);
+  --step-s1: clamp(0.78rem, calc(0.74rem + 0.20vw), 0.90rem);
+  --step-x0: clamp(0.88rem, calc(0.79rem + 0.42vw), 1.13rem);
+  --step-x1: clamp(0.98rem, calc(0.84rem + 0.70vw), 1.41rem);
+  --step-x2: clamp(1.11rem, calc(0.89rem + 1.08vw), 1.76rem);
+  --step-x3: clamp(1.25rem, calc(0.93rem + 1.59vw), 2.20rem);
+  --step-x4: clamp(1.40rem, calc(0.95rem + 2.24vw), 2.75rem);
+
+  /* @link https://utopia.fyi/space/calculator?c=320,14,1.125,1280,18,1.25,4,5,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l */
+  --space-3xs: clamp(0.25rem, calc(0.23rem + 0.10vw), 0.31rem);
+  --space-2xs: clamp(0.44rem, calc(0.40rem + 0.21vw), 0.56rem);
+  --space-xs: clamp(0.69rem, calc(0.63rem + 0.31vw), 0.88rem);
+  --space-s: clamp(0.88rem, calc(0.79rem + 0.42vw), 1.13rem);
+  --space-m: clamp(1.31rem, calc(1.19rem + 0.63vw), 1.69rem);
+  --space-l: clamp(1.75rem, calc(1.58rem + 0.83vw), 2.25rem);
+  --space-xl: clamp(2.63rem, calc(2.38rem + 1.25vw), 3.38rem);
+  --space-2xl: clamp(3.50rem, calc(3.17rem + 1.67vw), 4.50rem);
+  --space-3xl: clamp(5.25rem, calc(4.75rem + 2.50vw), 6.75rem);
+
+  --width: 70ch;
+  --body-line-height: 1.5;
+  --head-line-height: 1.3;
+}
+
+html {
+  /* use the border-box box model instead of the browser default content-box */
+  box-sizing: border-box;
+  /* fallback for safari - remove if it starts supporting scrollbar-gutter */
+  overflow-y: scroll;
+}
+
+/* if a web browser supports `scrollbar-gutter`, use that instead */
+@supports (scrollbar-gutter: stable both-edges) {
+  html {
+    overflow-y: auto;
+    scrollbar-gutter: stable both-edges;
+  }
+}
+
+/* inherit the border-box model in all elements */
+/* this allows elements to override the box-model if needed and make their
+ * children inherit their custom box-model */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* remove all browser default margins and paddings */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* if any of the following elements don't exist, the rule still applies  */
+:is(code, kbd, samp, pre) {
+  font-family: var(--mono-font);
+  overflow-x: auto;
+}
+
+/* reduce distraction from text by removing underlines from hyperlinks */
+/* rely on color to distinguish hyperlinks */
+/* the order of pseudo classes should follow the LVHA order */
+/* :link, :visited, :hover, :active */
+a {
+  color: var(--fg-href);
+  text-decoration: none;
+}
+
+/* subdue the color of visited hyperlinks */
+a:visited {
+  color: var(--fg-color);
+}
+
+/* underline hyperlinks on hover and increase their underline offset */
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: var(--space-3xs);
+}
+
+/* if the role of a list is explicitly defined, it isn't being used as a list */
+ul[role="list"] {
+  padding: 0;
+  list-style: none;
+}
+
+/* prevent overflow of possibly long lines */
+:is(p, li, h1) {
+  overflow-wrap: break-word;
+}
+
+:is(img, video) {
+  /* never render images/videos wider than their containing element */
+  max-inline-size: 100%;
+  height: auto;
+  /* preserve the aspect ratio of the image */
+  block-size: auto;
+  margin-inline: auto;
+}
+
+/* -------------------------------------------------------------------------- */
+
+body {
+  /* layout */
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* readability */
+  margin: var(--space-m) auto;
+  width: min(90%, var(--width));
+  font-size: var(--step-x0);
+  line-height: var(--body-line-height);
+  /* aesthetics */
+  font-family: var(--sans-font);
+  color: var(--fg-color);
+  background: var(--bg-color);
+}
+
+/* add margins on the left and right of the child elements of body */
+/* body > * { */
+/*   margin-inline: auto; */
+/* } */
+
+/* -------------------------------------------------------------------------- */
+
+.primary-header {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+:is(img, video) {
+  /* make images/videos blocks rather than inline elements */
+  display: block;
+}
+
+.avatar {
+  border-radius: var(--step-x1);
+}
+
+h1 {
+  font-size: var(--step-x3);
+  line-height: var(--head-line-height);
+}
+
+/* -------------------------------------------------------------------------- */
+
+:is(.primary-nav, .primary-footer, .article-footer, .tag-list-nav) > ul[role="list"] {
+  display: flex;
+  flex-flow: row wrap;
+  /* prevent accidental incorrect clicks by increasing space between elements */
+  justify-content: space-evenly;
+  gap: var(--space-s);
+}
+
+.primary-footer {
+  font-size: var(--step-s1);
+  border-block-start: 0.1rem dotted var(--fg-border);
+}
+
+/* add a hash symbol before the taxonomy tag links */
+.tag::before {
+  content: "#";
+}
+
+.tag-sup {
+  padding-inline: var(--space-3xs);
+}
+
+/* the stack layout for the child elements of article */
+article > * + * {
+  margin-top: var(--space-s);
+}
+
+/* the stack layout for the body and the main element */
+:is(body, main) > * + * {
+  margin-top: var(--space-l);
+}
+
+.article-header > ul[role="list"] {
+  display: inline-flex;
+  flex-flow: row wrap;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}
+
+.article-header {
+  display: flex;
+  gap: var(--space-2xs);
+  justify-content: space-between;
+  border-block-end: 0.1rem dotted var(--fg-border);
+}
+
+/* borrowed from the html5-boilerplate css file on github */
+/* h5bp/html5-boilerplate/blob/5382f78315be9ed31546131ec543353d9c4ee5b3/dist/css/style.css#L109 */
+/* hide the title by default */
+.post-title {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.post-title::before {
+  content: " · ";
+}
+
+/* show the title on devices which are at least as wide as the iPad Mini */
+@media screen and (min-width: 48rem) {
+  .post-title {
+    clip: inherit;
+    height: inherit;
+    margin: inherit;
+    overflow: inherit;
+    position: inherit;
+    white-space: inherit;
+    width: inherit;
+  }
+}
+
+.unknown-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block: var(--space-xl);
+}
+
+/* code blocks inside pre should be a block otherwise it doesn't work well when
+ * text overflows inside code */
+pre > code {
+  display: block;
+}
+
+code[role="img"] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.figquote {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* don't style h2 to h6 because it's not needed on this website */
+:is(h2, h3, h4, h5, h6) {
+  font-size: var(--step-x0);
+}
+
+pre {
+  padding: var(--space-2xs);
+  border: 0.1rem solid var(--fg-border);
+  border-radius: var(--step-s5);
+}
+
+/* show the name of the programming language inside pre */
+pre[data-lang]::before {
+  display: block;
+  content: attr(data-lang);
+  text-decoration: underline var(--fg-border) solid;
+  text-underline-offset: var(--space-3xs);
+  text-decoration-thickness: 0.1rem;
+  text-transform: uppercase;
+  padding-block-end: var(--space-2xs);
+}
+
+/* add space after line numbers and don't select the line numbers for copying */
+pre[data-linenos] table tbody tr td:first-child {
+  padding-inline-end: var(--space-s);
+  user-select: none;
+}
+
+pre[data-linenos] table {
+  /* if we set table width to 100% and if text overflows, the space separation
+   * between cells is removed */
+  /* width: 100%; */
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-indent: 0;
+}
+
+.unknown-page-emoticon {
+  font-size: var(--step-x3);
+  padding: var(--space-2xs);
+  border: 0;
+  border-radius: 0;
+}
+
+blockquote {
+  margin-inline-start: var(--space-l);
+  padding: var(--space-2xs);
+  border-inline-start: var(--step-s4) solid var(--fg-border);
+}
+
+figcaption {
+  text-align: center;
+}
+
+:is(ul, ol) {
+  padding-inline: var(--space-l);
+}
+
+mark {
+  /* plays well with at least 1.5 line-height or more */
+  padding-inline: var(--space-3xs);
+  padding-block: 0.1rem;
+  color: var(--fg-mark);
+  background: var(--bg-mark);
+  border-radius: var(--step-s5);
+}
+
+kbd {
+  border-inline: 0.1rem solid var(--fg-border);
+  border-block-start: 0.1rem solid var(--fg-border);
+  border-block-end: 0.2rem solid var(--fg-border);
+  border-radius: var(--step-s5);
+  padding-inline: var(--space-3xs);
+  padding-block: 0.1rem;
+}
+
+/* -------------------------------------------------------------------------- */

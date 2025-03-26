@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title></title>
+    <subtitle>This is where I will be blogging about my projects!</subtitle>
+    <link href="https://blog.lucasholten.com/atom.xml" rel="self" type="application/atom+xml"/>
+    <link href="https://blog.lucasholten.com"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2024-11-24T00:00:00+00:00</updated>
+    <id>https://blog.lucasholten.com/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Announcing rust-query</title>
+        <published>2024-11-24T00:00:00+00:00</published>
+        <updated>2024-11-24T00:00:00+00:00</updated>
+        <author>
+          <name>Unknown</name>
+        </author>
+        <link rel="alternate" href="https://blog.lucasholten.com/rust-query-announcement/" type="text/html"/>
+        <id>https://blog.lucasholten.com/rust-query-announcement/</id>
+        
+        <content type="html">&lt;h1 id=&quot;safe-relational-database-queries-using-the-rust-type-system&quot;&gt;Safe relational database queries using the Rust type system&lt;&#x2F;h1&gt;
+&lt;p&gt;Do you want to persist your data safely without migration issues and easily write complicated queries? All of this without writing a single line of SQL? If so, then &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;LHolten&#x2F;rust-query&quot;&gt;I am making &lt;code&gt;rust-query&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; for you!&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This is my first blog post about &lt;code&gt;rust-query&lt;&#x2F;code&gt;, a project I&#x27;ve been working on for many months. I hope you like it!&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;h3 id=&quot;rust-and-databases&quot;&gt;Rust and Databases&lt;&#x2F;h3&gt;
+&lt;p&gt;There is only one reason why I made this library and it is because I don&#x27;t like the current options for interacting with a database from Rust. The existing libraries don&#x27;t provide the compile time guarantees that I want and are verbose or awkward like SQL.&lt;&#x2F;p&gt;
+&lt;p&gt;The reason I care so much is that databases are really cool. They solve a huge problem of making crash-resistant software with support for atomic transactions.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;structured-query-language-sql-is-a-protocol&quot;&gt;Structured Query Language (SQL) is a protocol&lt;&#x2F;h2&gt;
+&lt;p&gt;For those who don&#x27;t know, SQL is &lt;strong&gt;the&lt;&#x2F;strong&gt; standard when it comes to interacting with databases. So much so that almost all databases only accept queries in some dialect of SQL.&lt;&#x2F;p&gt;
+&lt;p&gt;My opinion is that SQL should be for computers to write. This would put it firmly in the same category as LLVM IR. The fact that it is human-readable is useful for debugging and testing, but I don&#x27;t think it&#x27;s how you want to write queries.&lt;&#x2F;p&gt;
+&lt;h1 id=&quot;introducing-rust-query&quot;&gt;Introducing &lt;code&gt;rust-query&lt;&#x2F;code&gt;&lt;&#x2F;h1&gt;
+&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;crates.io&#x2F;crates&#x2F;rust-query&quot;&gt;&lt;code&gt;rust-query&lt;&#x2F;code&gt;&lt;&#x2F;a&gt; is my answer to relational database queries in Rust. It&#x27;s an opinionated library that deeply integrates with Rust&#x27;s type system to make database operations feel Rust-native.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;key-features-and-design-decisions&quot;&gt;Key Features and Design Decisions&lt;&#x2F;h2&gt;
+&lt;p&gt;I could write a blog post about each one of these, but let&#x27;s keep it short for now:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Explicit table aliasing&lt;&#x2F;strong&gt;: Joining a table gives back a dummy representing that table &lt;code&gt;let user = User::join(rows);&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Null safety&lt;&#x2F;strong&gt;: Optional values in queries have &lt;code&gt;Option&lt;&#x2F;code&gt; type, requiring special care to handle.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Intuitive aggregates&lt;&#x2F;strong&gt;: Our aggregates are guaranteed to give a single result for every row they&#x27;re joined on. After trying it, you&#x27;ll see this is much more intuitive than traditional &lt;code&gt;GROUP BY&lt;&#x2F;code&gt; operations.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Type-safe foreign key navigation&lt;&#x2F;strong&gt;: Database constraints are like type signatures, so you can rely on them for your queries with easy-to-use implicit joins by foreign key (e.g., &lt;code&gt;track.album().artist().name()&lt;&#x2F;code&gt;).&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Type-safe unique lookups&lt;&#x2F;strong&gt;: For example, you can get an &lt;code&gt;Option&amp;lt;Rating&amp;gt;&lt;&#x2F;code&gt; dummy with &lt;code&gt;Rating::unique(my_user, my_story)&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Multi-versioned schema&lt;&#x2F;strong&gt;: It&#x27;s declarative and you can see the differences between all past versions of the schema at once!&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Type-safe migrations&lt;&#x2F;strong&gt;: Migrations have all the power of queries and can use arbitrary Rust code to process rows. Ever had to consult something outside the database for use in a migration? Now you can!&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Type-safe unique conflicts&lt;&#x2F;strong&gt;: Inserting and updating rows in tables with unique constraints results in specialized error types.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Row references tied to transaction lifetime&lt;&#x2F;strong&gt;: Row references can only be used while the row is guaranteed to exist.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;strong&gt;Encapsulated typed row IDs&lt;&#x2F;strong&gt;: The actual row numbers are never exposed from the library API. Application logic should not need to know about them.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;let-s-see-it&quot;&gt;Let&#x27;s see it!&lt;&#x2F;h2&gt;
+&lt;p&gt;You always start by defining a schema. With &lt;code&gt;rust-query&lt;&#x2F;code&gt; it&#x27;s easy to migrate to a different schema later.&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#282828;color:#ebdbb280;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;#[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#83a598;&quot;&gt;schema&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;enum &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;Schema {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    User {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        name: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;String&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    },
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    Story {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        author: User,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        title: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;String&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        content: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;String
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    },
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    #[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#83a598;&quot;&gt;unique&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(user, story)]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    Rating {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        user: User,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        story: Story,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        stars: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;i64
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    },
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;use &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;v0::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Schema defintions in &lt;code&gt;rust-query&lt;&#x2F;code&gt; use enum syntax, but no actual enum is defined here.
+This schema defines three tables with specified columns and relationships:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using another table name as a column type creates a foreign key constraint.&lt;&#x2F;li&gt;
+&lt;li&gt;The &lt;code&gt;#[unique]&lt;&#x2F;code&gt; attribute creates named unique constraints.&lt;&#x2F;li&gt;
+&lt;li&gt;The &lt;code&gt;#[schema]&lt;&#x2F;code&gt; macro parses the enum syntax and generates a module &lt;code&gt;v0&lt;&#x2F;code&gt; that contains the database API.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;writing-queries&quot;&gt;Writing Queries&lt;&#x2F;h3&gt;
+&lt;p&gt;First, let&#x27;s see how to insert some data into our schema:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#282828;color:#ebdbb280;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;insert_data&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(txn: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;mut &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;TransactionMut&amp;lt;Schema&amp;gt;) {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#928374;&quot;&gt;&#x2F;&#x2F; Insert users
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; alice &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; txn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;insert&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(User {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        name: &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;alice&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    });
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; bob &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; txn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;insert&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(User {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        name: &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;bob&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    });
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#928374;&quot;&gt;&#x2F;&#x2F; Insert a story
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; dream &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; txn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;insert&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(Story {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        author: alice,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        title: &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;My crazy dream&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        content: &amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;A dinosaur and a bird...&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    });
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#928374;&quot;&gt;&#x2F;&#x2F; Insert a rating - note the try_insert due to the unique constraint
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; rating &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; txn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;try_insert&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(Rating {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        user: bob,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        story: dream,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        stars: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#d3869b;&quot;&gt;5&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    }).&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;expect&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;no rating for this user and story exists yet&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;A few important points about insertions:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;We need a mutable transaction (&lt;code&gt;TransactionMut&lt;&#x2F;code&gt;) to modify the database.&lt;&#x2F;li&gt;
+&lt;li&gt;Insert operations return references to the newly inserted rows.&lt;&#x2F;li&gt;
+&lt;li&gt;When inserting into tables with unique constraints, use &lt;code&gt;try_insert&lt;&#x2F;code&gt; to handle potential conflicts.&lt;&#x2F;li&gt;
+&lt;li&gt;The error type of &lt;code&gt;try_insert&lt;&#x2F;code&gt; is based on how many unique constraints the table has.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Now let&#x27;s query this data:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#282828;color:#ebdbb280;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;query_data&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(txn: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;Transaction&amp;lt;Schema&amp;gt;) {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; results &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; txn.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;query&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(|rows| {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; story &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;Story::join(rows);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; avg_rating &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;= aggregate&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(|rows| {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;            &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; rating &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;Rating::join(rows);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;            rows.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;filter_on&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(rating.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;story&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(), &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;&amp;amp;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;story);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;            rows.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;avg&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(rating.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;stars&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;().&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;as_float&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;())
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        });
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        rows.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;into_vec&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;((story.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;title&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(), avg_rating))
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    });
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;for &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(title, avg_rating) &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;in&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; results {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        println!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;story &amp;#39;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;{title}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;&amp;#39; has avg rating &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;{avg_rating:?}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;);
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    }
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Key points about queries:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;rows&lt;&#x2F;code&gt; represents the current set of rows in the query.&lt;&#x2F;li&gt;
+&lt;li&gt;Joins can add rows and filters can remove rows. &lt;details&gt;By joining a table like &lt;code&gt;Story&lt;&#x2F;code&gt;, the &lt;code&gt;rows&lt;&#x2F;code&gt; set is mutated to be the Cartesian product of itself and the rows from the joined table. The query above only has a single &lt;code&gt;join&lt;&#x2F;code&gt;, so we know it will give exactly one result for each row in the &lt;code&gt;Story&lt;&#x2F;code&gt; table.&lt;&#x2F;details&gt; &lt;&#x2F;li&gt;
+&lt;li&gt;Using &lt;code&gt;aggregate&lt;&#x2F;code&gt; to calculate an aggregate, does not change the number of rows in the query.&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;rows.filter_on&lt;&#x2F;code&gt; can be used to filter rows in the aggregate to match a value from the outer scope.&lt;&#x2F;li&gt;
+&lt;li&gt;The &lt;code&gt;rows.avg&lt;&#x2F;code&gt; method returns the average of the rows in the aggregate, if there are no rows then the average will evaluate to &lt;code&gt;None&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;Results can be collected into vectors of tuples or structs.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;schema-evolution-and-migrations&quot;&gt;Schema Evolution and Migrations&lt;&#x2F;h3&gt;
+&lt;p&gt;Let&#x27;s say you want to add an email address to each user. Here&#x27;s how you&#x27;d create the new schema version:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#282828;color:#ebdbb280;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;#[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#83a598;&quot;&gt;schema&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;#[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#83a598;&quot;&gt;version&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(0..&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;1)]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;enum &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;Schema {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    User {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        name: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;String&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        #[&lt;&#x2F;span&gt;&lt;span style=&quot;color:#83a598;&quot;&gt;version&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(1..)]
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        email: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;String&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;,
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    },
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    &lt;&#x2F;span&gt;&lt;span style=&quot;font-style:italic;color:#928374;&quot;&gt;&#x2F;&#x2F; ... rest of schema ...
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;}
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;use &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;v1::&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;*&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;And here&#x27;s how you&#x27;d migrate the data:&lt;&#x2F;p&gt;
+&lt;pre data-lang=&quot;rust&quot; style=&quot;background-color:#282828;color:#ebdbb280;&quot; class=&quot;language-rust &quot;&gt;&lt;code class=&quot;language-rust&quot; data-lang=&quot;rust&quot;&gt;&lt;span style=&quot;color:#fb4934;&quot;&gt;let&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; m &lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;=&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt; m.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;migrate&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(v1::update::Schema {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    user: &lt;&#x2F;span&gt;&lt;span style=&quot;color:#fabd2f;&quot;&gt;Box&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;::new(|old_user| {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        Alter::new(v1::update::UserMigration {
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;            email: old_user
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;                .&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;name&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;()
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;                .&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;map_dummy&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;(|name| format!(&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#8ec07c;&quot;&gt;{name}&lt;&#x2F;span&gt;&lt;span style=&quot;color:#b8bb26;&quot;&gt;@example.com&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;&amp;quot;)),
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;        })
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;    }),
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#fbf1c7;&quot;&gt;});
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;v1::update&lt;&#x2F;code&gt; module contains structs defining the difference between schema &lt;code&gt;v0&lt;&#x2F;code&gt; and schema &lt;code&gt;v1&lt;&#x2F;code&gt;.&lt;&#x2F;li&gt;
+&lt;li&gt;We use these structs to implement the migration. This way the migration is type checked against both the old and new schemas.&lt;&#x2F;li&gt;
+&lt;li&gt;Note that inside migrations we can execute all the single-row queries we want: aggregates, unique constraint lookups etc.!&lt;&#x2F;li&gt;
+&lt;li&gt;We can also use &lt;code&gt;map_dummy&lt;&#x2F;code&gt; with arbitrary Rust to process rows further.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;&lt;code&gt;rust-query&lt;&#x2F;code&gt; represents a fresh approach to database interactions in Rust, prioritizing:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Checking everything possible at compile time.&lt;&#x2F;li&gt;
+&lt;li&gt;Making it possible to compose queries with each other and arbitrary Rust.&lt;&#x2F;li&gt;
+&lt;li&gt;Enabling schema evolution with type-checked migrations.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;While still in development, the library already allows building experimental database-backed applications in Rust. I encourage you to try it out and provide feedback through &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;LHolten&#x2F;rust-query&quot;&gt;GitHub&lt;&#x2F;a&gt; issues!&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The library currently uses SQLite as its only backend, chosen for its embedded nature. This will not change anytime soon, as one backend is most practical while &lt;code&gt;rust-query&lt;&#x2F;code&gt; is in development.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+</content>
+        
+    </entry>
+</feed>
