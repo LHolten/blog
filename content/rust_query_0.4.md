@@ -178,8 +178,7 @@ Upgrading the `TransactionWeak` back to a `TransactionMut` is something I intend
 
 ## Optional Combinator
 
-The `optional` combinator is similar to `aggregate`, but instead of allowing joins, it only allows adding more optional values.
-This is useful if you want to join a table on an optional column for example.
+The `optional` combinator allows combining any number of optional expressions and returning a `Select` when all of the input expressions are `Some` (not null).
 
 Let us looks at a bit of an advanced example:
 ```rust
@@ -190,34 +189,31 @@ struct Info {
 }
 
 fn location_info(txn: &Transaction<Schema>, loc: TableRow<Location>) -> Option<Info> {
-    txn.query_one(optional(|row|{
-        let (optional_average_value, total_duration) = aggregate(|rows| {
-            let m = Measurement::join(rows);
-            rows.filter_on(m.location(), loc);
-            (rows.avg(m.value()), rows.sum(m.duration()))
+    txn.query_one(aggregate(|rows| {
+        let m = Measurement::join(rows);
+        rows.filter_on(m.location(), loc);
+        
+        optional(|row|{
+            let average_value = row.and(rows.avg(m.value()));
+            row.then(InfoSelect {
+                average_value,
+                total_duration: rows.sum(m.duration()),
+            })
         })
-        let average_value = row.and(optional_average_value);
-        row.then(InfoSelect {
-            average_value,
-            total_duration,
-        })
-    }))
+    })
 }
 ```
-First note that the aggregate filters measurements for a specific location `rows.filter_on`.
+First note that the aggregate filters measurements for a specific location using `rows.filter_on`.
 Since not all locations have associated measurements, this list may be empty.
 That is why the `rows.avg` method return an expression with `Option` type.
-We only want to return `Some(Info)` if we have an average though, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
+We only want to return `Some(Info)` if we have an average, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
 
+There are many ways to combine `aggregate` and `optional`, especially in combination with unique constraints.
 
-## Lots of Renaming
-
-Rarely do I get the name of a type or method correct on the first try.
-
-### Types
-- `Column` -> `Expr`
-- `Dummy` -> `Select`
-
-### methods
-
-## Some Additional Operators
+## Other Breaking Changes:
+- `Query::into_vec` no longer sorts the rows.
+- `Column` is renamed to `Expr`.
+- `Dummy` is renamed to `Select`.
+- `TransactionMut::insert` is renamed to `TransactionMut::insert_ok` and `TransactionMut::try_insert` is renamed to `TransactionMut::insert`.
+Similar renamings happened for `TransactionMut::update` and `TransactionMut::delete`.
+- Probably a bunch of other things.
