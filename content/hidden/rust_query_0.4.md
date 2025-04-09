@@ -28,11 +28,10 @@ pub mod vN {
 }
 use v0::*;
 ```
-This syntax is slightly different `rust-query 0.3`, the module of structs is much closer to the actual output of the `schema` macro. You can think of the whole `vN` module as a template for the modules that the macro generates. The generated modules have names `v0`, `v1` etc, depending on the version range specified. 
-<!-- Of course not all versions of the schema are going to be identical, we will look at how to specify differences later. -->
+This syntax is slightly different from `rust-query 0.3`; the module of structs is much closer to the actual output of the `schema` macro. You can think of the whole `vN` module as a template for the modules that the macro generates. The generated modules have names `v0`, `v1` etc, depending on the version range specified.
 
 Now that we have a schema to play with, let us compare the old and new approach to retrieving some data.
-First, this is how you would retrieve some data in the `rust-query 0.3`.
+First, this is how you would retrieve data in `rust-query 0.3`.
 ```rust
 #[derive(Select)]
 struct Score {
@@ -50,9 +49,9 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Score> {
     })
 }
 ```
-As you can see this is very flexible, but for a simple query like this one it is clearly overpowered.
+As you can see, this is very flexible, but for a simple query like this one it is too verbose.
 
-That is why I introduce a new trait called `FromExpr`. This trait is intended to create `Select`s from single expressions. What is more interesting is that it can be derived on structs as well. With this derive macro the previous example now looks like this:
+That is why I introduce a new trait called `FromExpr`. This trait is intended to create `Select`s from single `Expr`essions. What is more interesting is that it can be derived on structs as well. With this derive macro the previous example now looks like this:
 ```rust,hl_lines=1-2 11
 #[derive(FromExpr)]
 #[rust_query(From = Measurement)]
@@ -82,16 +81,16 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)>
     })
 }
 ```
-`Score` is completely gone and all that is left is the return type of the function, which now specifies the columns that will be retrieved from the database.
+The `Score` struct is completely gone and all that is left is the return type of the function, which now specifies the columns that will be retrieved from the database.
 
 This brings us to the new "structural types".
 
 ## Structural Types
 
-For every table type like `Measurement` there now is also a macro with the same name.
-This allows you to select a subset of the columns in that table.
-so for example it is possible to write `Measurement!(score, timestamp)` and that will specify the
-`Measurement` type with only those columns filled in.
+For every table type like `Measurement` there is a macro with the same name.
+This allows you to create a type to select a subset of columns in that table.
+For example, it is possible to write `Measurement!(score, timestamp)` and that will specify the
+`Measurement` type with only those two columns filled in.
 
 How it works is that `Measurement` is actually generic over the type of each field and the macro
 expands to specify those generics. Fields that are not used will get the `()` type.
@@ -100,7 +99,7 @@ It is also possible to override the type of a field with a different type that i
 So for example it is possible to use `Measurement!(score, location as Location!(name))` to retrieve
 scores with the name of the location.
 
-The syntax is a bit weird because I wanted to make it concise and still let rustfmt format it.
+The syntax is a bit weird because I wanted to make it concise and still let `rustfmt` format it.
 
 ## Migration Refactor
 
@@ -174,7 +173,7 @@ fn do_stuff(mut txn: TransactionMut<Schema>) {
 }
 ```
 To prevent use-after-delete of row references, `TransactionWeak` does not allow querying the database.
-`TransactionWeak` can thus only remove rows for which a `TableRow` has been retrieved before.
+`TransactionWeak` can thus only remove rows for which a `TableRow` has already been retrieved.
 Upgrading the `TransactionWeak` back to a `TransactionMut` is something I intend to add later.
 
 ## Optional Combinator
