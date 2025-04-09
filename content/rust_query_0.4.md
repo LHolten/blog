@@ -155,12 +155,59 @@ The recommended approach is to aggregate all schema changes in a single schema v
 This approach keeps the size of the multi-versioned schema in check. 
 
 ## Deletion
+Deleting rows has been possible since `rust-query 0.3.1`. It makes use of a new transaction type called `TransactionWeak`, which is named after the `Weak` reference counted type.
 
+```rust
+fn do_stuff(mut txn: TransactionMut<Schema>) {
+    let loc: TableRow<Location> = txn.insert_ok(Location {
+        name: "Amsterdam",
+    });
+
+    let txn: TransactionWeak<Schema> = txn.downgrade();
+    
+    let is_deleted = txn.delete(loc).expect("there should be no fk references to this row");
+    assert!(is_deleted);
+
+    let is_not_deleted_twice = !txn.delete(loc).expect("there should be no fk references to this row");
+    assert!(is_not_deleted_twice);
+}
+```
+To prevent use-after-delete of row references, `TransactionWeak` does not allow querying the database.
+`TransactionWeak` can thus only remove rows for which a `TableRow` has been retrieved before.
+Upgrading the `TransactionWeak` back to a `TransactionMut` is something I intend to add later.
 
 ## Optional Combinator
 
 The `optional` combinator is similar to `aggregate`, but instead of allowing joins, it only allows adding more optional values.
 This is useful if you want to join a table on an optional column for example.
+
+Let us looks at a bit of an advanced example:
+```rust
+#[derive(Select)]
+struct Info {
+    average_value: f64,
+    total_duration: i64,
+}
+
+fn location_info(txn: &Transaction<Schema>, loc: TableRow<Location>) -> Option<Info> {
+    txn.query_one(optional(|row|{
+        let (optional_average_value, total_duration) = aggregate(|rows| {
+            let m = Measurement::join(rows);
+            rows.filter_on(m.location(), loc);
+            (rows.avg(m.value()), rows.sum(m.duration()))
+        })
+        let average_value = row.and(optional_average_value);
+        row.then(InfoSelect {
+            average_value,
+            total_duration,
+        })
+    }))
+}
+```
+First note that the aggregate filters measurements for a specific location `rows.filter_on`.
+Since not all locations have associated measurements, this list may be empty.
+That is why the `rows.avg` method return an expression with `Option` type.
+We only want to return `Some(Info)` if we have an average though, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
 
 
 ## Lots of Renaming
