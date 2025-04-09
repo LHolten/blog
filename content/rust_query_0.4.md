@@ -188,19 +188,19 @@ struct Info {
     total_duration: i64,
 }
 
-fn location_info(txn: &Transaction<Schema>, loc: TableRow<Location>) -> Option<Info> {
+fn location_info<'t>(txn: &Transaction<'t, Schema>, loc: TableRow<'t, Location>) -> Option<Info> {
     txn.query_one(aggregate(|rows| {
         let m = Measurement::join(rows);
         rows.filter_on(m.location(), loc);
-        
-        optional(|row|{
+
+        optional(|row| {
             let average_value = row.and(rows.avg(m.value()));
             row.then(InfoSelect {
                 average_value,
                 total_duration: rows.sum(m.duration()),
             })
         })
-    })
+    }))
 }
 ```
 First note that the aggregate filters measurements for a specific location using `rows.filter_on`.
