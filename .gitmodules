@@ -4,6 +4,3 @@
 [submodule "themes/abridge"]
 	path = themes/abridge
 	url = https://github.com/jieiku/abridge.git
-[submodule "syntaxes/rust-enhanced"]
-	path = syntaxes/rust-enhanced
-	url = git@github.com:rust-lang/rust-enhanced.git
