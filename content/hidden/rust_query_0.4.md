@@ -1,10 +1,11 @@
 +++
 title = "Version 0.4 of rust-query is released!"
-draft = true
 date = "2025-3-7"
 description = "rust-query 0.4 has many improvements described in this post"
 [taxonomies]
 tags = [ "database", "rust" ]
+[extra]
+hidden = true
 +++
 
 This release has some very cool new features.
