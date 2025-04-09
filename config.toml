@@ -23,9 +23,10 @@ generate_feeds = true
 [markdown]
 highlight_code = true
 extra_syntaxes_and_themes = ["highlight_themes/gruvbox", "syntaxes/rust-enhanced"]
-highlight_theme = "gruvbox-dark"
+highlight_theme = "css"
 
 
 [extra]
 mastodon = "https://hachyderm.io/@lholten"
 github = "LHolten"
+feed = true

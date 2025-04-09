@@ -10,7 +10,7 @@ tags = [ "database", "rust" ]
 This release has some very cool new features.
 
 To show the new features, I will set the stage by defining a schema:
-```Rust Enhanced
+```rust
 #[schema(Schema)]
 #[version(0..=0)]
 pub mod vN {
@@ -32,7 +32,7 @@ This syntax is slightly different `rust-query 0.3`, the module of structs is muc
 
 Now that we have a schema to play with, let us compare the old and new approach to retrieving some data.
 First, this is how you would retrieve some data in the `rust-query 0.3`.
-```Rust Enhanced
+```rust
 #[derive(Select)]
 struct Score {
     score: i64,
@@ -52,7 +52,7 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Score> {
 As you can see this is very flexible, but for a simple query like this one it is clearly overpowered.
 
 That is why I introduce a new trait called `FromExpr`. This trait is intended to create `Select`s from single expressions. What is more interesting is that it can be derived on structs as well. With this derive macro the previous example now looks like this:
-```Rust Enhanced,hl_lines=1-2 11
+```rust,hl_lines=1-2 11
 #[derive(FromExpr)]
 #[rust_query(From = Measurement)]
 struct Score {
@@ -73,7 +73,7 @@ Defining the `Score` type is still quite verbose though.
 Which is why I added another option that is even more concise.
 
 Hold on to your hat, because this improvement is going to blow you away!
-```Rust Enhanced,hl_lines=1
+```rust,hl_lines=1
 fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)> {
     txn.query(|rows| {
         let m = Measurement::join(rows);
@@ -108,7 +108,7 @@ more ergonomic.
 To show of the new migrations we need to add a new version to the schema.
 As an example, let us rename the `score` column to `value` and change the datatype from `i64` to `f64`.
 
-```Rust Enhanced,hl_lines=2 5 7-8 18
+```rust,hl_lines=2 5 7-8 18
 #[schema(Schema)]
 #[version(0..=1)]
 pub mod vN {
@@ -131,7 +131,7 @@ use v1::*;
 This is quite straightforward, we add the new column and specify when these columns start and stop to exist.
 
 Now we need to write the actual migration:
-```Rust Enhanced,hl_lines=5-9
+```rust,hl_lines=5-9
 fn migrate(client: &mut LocalClient) -> Database<Schema> {
     let m = client
         .migrator(Config::open("db.sqlite"))
