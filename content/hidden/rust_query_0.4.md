@@ -72,7 +72,6 @@ The derive macro will fill each field from the column with identical name. So no
 
 Defining the `Score` type is still quite verbose though.
 Which is why I added another option that is even more concise.
-Hold on to your hat, because this improvement is going to blow you away!
 ```rust,hl_lines=1
 fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)> {
     txn.query(|rows| {
@@ -81,9 +80,7 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)>
     })
 }
 ```
-The `Score` struct is completely gone and all that is left is the return type of the function, which now specifies the columns that will be retrieved from the database.
-
-This brings us to the new "structural types".
+The `Score` struct is completely gone! All that is left is the return type of the function, which now specifies the columns that will be retrieved from the database. This features is what I will call "structural types".
 
 ## Structural Types
 
