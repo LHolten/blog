@@ -8,7 +8,7 @@ tags = [ "database", "rust" ]
 hidden = true
 +++
 
-It has been more than 4 months since I [wrote about](/rust-query-announcement) `rust-query` for the first time. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the rust community!
+It has been more than 4 months since I first [wrote about](/rust-query-announcement) `rust-query`, the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
 
 ## Type Driven Select
 To show the new features, I will set the stage by defining a schema:
@@ -244,10 +244,11 @@ Here are some more changes that I won't go in too much detail about:
 
 - `Query::into_vec` no longer sorts the rows.
 - Updates now use the `Update` type for each column.
+- Added support for `GLOB` and `LIKE` operators (contributed by @teamplayer3).
 - Renamed Dummy to Select.
 - Renamed Column to Expr.
 - Renamed try_insert to insert and insert to insert_ok.
 - Renamed try_delete to delete and delete to delete_ok.
 - Renamed try_update to update and update to update_ok.
 
-Please take a look at [https://github.com/LHolten/rust-query/blob/main/CHANGELOG.md] for more.
+Please take a look at [the changelog](https://github.com/LHolten/rust-query/blob/main/CHANGELOG.md) for more.
