@@ -1,6 +1,6 @@
 +++
 title = "[Draft Post] Version 0.4 of rust-query is released!"
-date = "2025-3-7"
+date = "2025-4-13"
 description = "rust-query 0.4 has many improvements described in this post"
 [taxonomies]
 tags = [ "database", "rust" ]
@@ -244,10 +244,10 @@ Here are some more changes that I won't go in too much detail about:
 - `Query::into_vec` no longer sorts the rows.
 - Updates now use the `Update` type for each column.
 - Added support for `GLOB` and `LIKE` operators (contributed by @teamplayer3).
-- Renamed Dummy to Select.
-- Renamed Column to Expr.
-- Renamed try_insert to insert and insert to insert_ok.
-- Renamed try_delete to delete and delete to delete_ok.
-- Renamed try_update to update and update to update_ok.
+- Renamed `Dummy` to `Select`.
+- Renamed `Column` to `Expr`.
+- Renamed `try_insert` to `insert` and `insert` to `insert_ok`.
+- Renamed `try_delete` to `delete` and `delete` to `delete_ok`.
+- Renamed `try_update` to `update` and `update` to `update_ok`.
 
 Please take a look at [the changelog](https://github.com/LHolten/rust-query/blob/main/CHANGELOG.md) for more.
