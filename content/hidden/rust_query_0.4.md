@@ -88,14 +88,12 @@ For every table type like `Measurement` there is a macro with the same name.
 This allows you to create a type to select a subset of columns in that table.
 For example, it is possible to write `Measurement!(score, timestamp)` and that will specify the
 `Measurement` type with only those two columns filled in.
-
-How it works is that `Measurement` is actually generic over the type of each field and the macro
+How it works is that `Measurement` struct is actually generic over the type of each field and the macro
 expands to specify those generics. Fields that are not used will get the `()` type.
 
 It is also possible to override the type of a field with a different type that implements `FromExpr`.
 So for example it is possible to use `Measurement!(score, location as Location!(name))` to retrieve
 scores with the name of the location.
-
 The syntax is a bit weird because I wanted to make it concise and still let `rustfmt` format it.
 
 ## Migration Refactor
@@ -143,9 +141,9 @@ fn migrate(client: &mut LocalClient) -> Database<Schema> {
 }
 ```
 The highlighted lines are all that we need to add to implement this migration.
-- Types in the `v0::migrate` folder are generated specifically to help with this migration.
+- Types in the `v0::migrate` module are generated specifically to help with this migration.
 They check that all tables are migrated and that things like unique constraint conflicts and foreign key errors are handled.
-- The closure provided to `txn.migrate_ok` can choose the argument type as long as it implements `FromExpr`.
+- The closure provided in `txn.migrate_ok(|old: v0::Measurement!(score)| ..)` can choose the argument type as long as it implements `FromExpr`.
 This works perfectly together with the structural type macros to select whatever is necessary to perform the migration.
 - Any number of changes can be bundled together in a single schema version update.
 The recommended approach is to aggregate all schema changes in a single schema version until the software is released and then to remove schema versions from the code when they no longer need to be supported.
@@ -233,10 +231,10 @@ However, for the `optional` combinator to be practical, it should be possible to
 To support this use case, `Expr` is now covariant and all APIs that relied on the invariant lifetime have been updated.
 
 Covariant lifetimes seem to have the additional benefit that `rustc` understands them better. This means that the error messages are better on average. Sadly there is at least one case I know of where `rustc` is being a bit too smart and suggests making the transaction lifetime static. While this suggestion is technically a correct one, it is not useful because transactions should normally have a short lifetime.
-Luckily the error improves even in this case, when the transaction is not used in the same scope as where it is created.
+Luckily, the error message is actually better than before when the transaction is not used in the same scope as where it is created.
 
 ## Other Changes
-Here are some more changes that I won't go in too much detail about:
+Here are some more changes that I won't go into too much detail about:
 
 - `Query::into_vec` no longer sorts the rows.
 - Updates now use the `Update` type for each column.
