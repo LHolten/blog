@@ -10,7 +10,6 @@ hidden = true
 
 It has been more than 4 months since I first [wrote about](/rust-query-announcement) `rust-query`, the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
 
-## Type Driven Select
 To show the new features, I will set the stage by defining a schema:
 ```rust
 #[schema(Schema)]
@@ -52,6 +51,7 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Score> {
 ```
 As you can see, this is very flexible, but for a simple query like this one it is too verbose.
 
+## Type Driven Select
 That is why I introduce a new trait called `FromExpr`. This trait is intended to create `Select`s from single `Expr`essions. What is more interesting is that it can be derived on structs as well. With this derive macro the previous example now looks like this:
 ```rust,hl_lines=1-2 11
 #[derive(FromExpr)]
@@ -68,11 +68,10 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Score> {
     })
 }
 ```
-The derive macro will fill each field from the column with identical name. So no more unnecessary selection like `score: m.score()`.
+The derive macro will fill each field from the column with identical name. So no more unnecessary selection like `score: m.score()` and `timestamp: m.timestamp()`.
 
 Defining the `Score` type is still quite verbose though.
 Which is why I added another option that is even more concise.
-
 Hold on to your hat, because this improvement is going to blow you away!
 ```rust,hl_lines=1
 fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)> {
@@ -186,7 +185,7 @@ fn do_stuff(mut txn: TransactionMut<Schema>) {
         name: "Amsterdam",
     });
 
-    let txn: TransactionWeak<Schema> = txn.downgrade();
+    let mut txn: TransactionWeak<Schema> = txn.downgrade();
     
     let is_deleted = txn.delete(loc).expect("there should be no fk references to this row");
     assert!(is_deleted);
