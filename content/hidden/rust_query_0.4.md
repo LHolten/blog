@@ -68,7 +68,7 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Score> {
     })
 }
 ```
-The derive macro will fill each field from the column with identical name. So no more unnecessary selection like `score: m.score()` and `timestamp: m.timestamp()`.
+The derive macro will fill each field from the column with the corresponding name. So no more unnecessary selection like `score: m.score()` and `timestamp: m.timestamp()`.
 
 Defining the `Score` type is still quite verbose though.
 Which is why I added another option that is even more concise.
@@ -80,15 +80,15 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)>
     })
 }
 ```
-The `Score` struct is completely gone! All that is left is the return type of the function, which now specifies the columns that will be retrieved from the database. This features is what I will call "structural types".
+The `Score` struct is completely gone! All that is left is the return type of the function, which now specifies the columns that will be retrieved from the database. This featurs is what I will call "structural types".
 
 ## Structural Types
 
-For every table type like `Measurement` there is a macro with the same name.
-This allows you to create a type to select a subset of columns in that table.
+For every table type like `Measurement`, there is a macro with the same name.
+This macro allows you to create a type to select a subset of columns in that table.
 For example, it is possible to write `Measurement!(score, timestamp)` and that will specify the
 `Measurement` type with only those two columns filled in.
-How it works is that `Measurement` struct is actually generic over the type of each field and the macro
+How it works is that the `Measurement` struct is actually generic over the type of each field and the macro
 expands to specify those generics. Fields that are not used will get the `()` type.
 
 It is also possible to override the type of a field with a different type that implements `FromExpr`.
@@ -150,7 +150,7 @@ The recommended approach is to aggregate all schema changes in a single schema v
 This approach keeps the size of the multi-versioned schema in check. 
 
 ### Migration "from" Attribute
-You can now use the `#[from]` attribute on table definitions to facilitate migrations like table renaming and duplication/splitting of tables. These were not possible before, so this is really helpfull.
+You can now use the `#[from]` attribute on table definitions to facilitate migrations like table renaming and duplication/splitting of tables. These were cumbersome before, so this is really helpful.
 ```rust,hl_lines=4 8-12 14
 #[schema(Schema)]
 #[version(0..=1)]
@@ -176,16 +176,18 @@ Deleting rows has been possible since `rust-query 0.3.1`. It makes use of a new 
 
 ```rust
 fn do_stuff(mut txn: TransactionMut<Schema>) {
-    let loc: TableRow<Location> = txn.insert_ok(Location {
-        name: "Amsterdam",
-    });
+    let loc: TableRow<Location> = txn.insert_ok(Location { name: "Amsterdam" });
 
     let mut txn: TransactionWeak<Schema> = txn.downgrade();
-    
-    let is_deleted = txn.delete(loc).expect("there should be no fk references to this row");
+
+    let is_deleted = txn
+        .delete(loc)
+        .expect("there should be no foreign key references to this row");
     assert!(is_deleted);
 
-    let is_not_deleted_twice = !txn.delete(loc).expect("there should be no fk references to this row");
+    let is_not_deleted_twice = !txn
+        .delete(loc)
+        .expect("there should be no foreign key references to this row");
     assert!(is_not_deleted_twice);
 }
 ```
@@ -226,8 +228,8 @@ That is why the `rows.avg` method return an expression with `Option` type.
 We only want to return `Some(Info)` if we have an average, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
 
 ### Covariant Expressions
-`Expr` (or rather `Column` before it was renamed) used to be invariant in its lifetime, this fundamental property made it easy to separate scopes.
-However, for the `optional` combinator to be practical, it should be possible to use `Expr` from the outer scope inside, while expressions created inside should be prevented from leaking out.
+`Expr` (or rather `Column` before it was renamed) used to be invariant in its lifetime. This fundamental property made it easy to separate scopes.
+However, for the `optional` combinator to be practical, it must be possible to use any `Expr` from the outer scope in the inner scope. At the same time expressions created inside should be prevented from leaking outside.
 To support this use case, `Expr` is now covariant and all APIs that relied on the invariant lifetime have been updated.
 
 Covariant lifetimes seem to have the additional benefit that `rustc` understands them better. This means that the error messages are better on average. Sadly there is at least one case I know of where `rustc` is being a bit too smart and suggests making the transaction lifetime static. While this suggestion is technically a correct one, it is not useful because transactions should normally have a short lifetime.
