@@ -8,8 +8,9 @@ tags = [ "database", "rust" ]
 hidden = true
 +++
 
-This release has some very cool new features.
+It has been more than 4 months since I [wrote about](/rust-query-announcement) `rust-query` for the first time. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the rust community!
 
+## Type Driven Select
 To show the new features, I will set the stage by defining a schema:
 ```rust
 #[schema(Schema)]
@@ -154,6 +155,28 @@ This works perfectly together with the structural type macros to select whatever
 The recommended approach is to aggregate all schema changes in a single schema version until the software is released and then to remove schema versions from the code when they no longer need to be supported.
 This approach keeps the size of the multi-versioned schema in check. 
 
+### Migration "from" Attribute
+You can now use the `#[from]` attribute on table definitions to facilitate migrations like table renaming and duplication/splitting of tables. These were not possible before, so this is really helpfull.
+```rust,hl_lines=4 8-12 14
+#[schema(Schema)]
+#[version(0..=1)]
+pub mod vN {
+    #[version(..1)]
+    pub struct User {
+        pub name: String,
+    }
+    #[version(1..)]
+    #[from(User)]
+    pub struct Author {
+        pub name: String,
+    }
+    pub struct Book {
+        pub author: Author,
+    }
+}
+```
+As you can see, renaming a table is as easy as copying the definition with a new name and adding the `#[from]` attribute. All tables with a foreign key to the old `User` table, such as `Book` here, just need to use the new table name (`Author`). The macro will figure out that for `v0`, the `Book` table actually still refers to the old table `User` by following the `#[from]` specification.
+
 ## Deletion
 Deleting rows has been possible since `rust-query 0.3.1`. It makes use of a new transaction type called `TransactionWeak`, which is named after the `Weak` reference counted type.
 
@@ -208,12 +231,23 @@ Since not all locations have associated measurements, this list may be empty.
 That is why the `rows.avg` method return an expression with `Option` type.
 We only want to return `Some(Info)` if we have an average, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
 
-There are many ways to combine `aggregate` and `optional`, especially in combination with unique constraints.
+### Covariant Expressions
+`Expr` (or rather `Column` before it was renamed) used to be invariant in its lifetime, this fundamental property made it easy to separate scopes.
+However, for the `optional` combinator to be practical, it should be possible to use `Expr` from the outer scope inside, while expressions created inside should be prevented from leaking out.
+To support this use case, `Expr` is now covariant and all APIs that relied on the invariant lifetime have been updated.
 
-## Other Breaking Changes:
+Covariant lifetimes seem to have the additional benefit that `rustc` understands them better. This means that the error messages are better on average. Sadly there is at least one case I know of where `rustc` is being a bit too smart and suggests making the transaction lifetime static. While this suggestion is technically a correct one, it is not useful because transactions should normally have a short lifetime.
+Luckily the error improves even in this case, when the transaction is not used in the same scope as where it is created.
+
+## Other Changes
+Here are some more changes that I won't go in too much detail about:
+
 - `Query::into_vec` no longer sorts the rows.
-- `Column` is renamed to `Expr`.
-- `Dummy` is renamed to `Select`.
-- `TransactionMut::insert` is renamed to `TransactionMut::insert_ok` and `TransactionMut::try_insert` is renamed to `TransactionMut::insert`.
-Similar renamings happened for `TransactionMut::update` and `TransactionMut::delete`.
-- Probably a bunch of other things.
+- Updates now use the `Update` type for each column.
+- Renamed Dummy to Select.
+- Renamed Column to Expr.
+- Renamed try_insert to insert and insert to insert_ok.
+- Renamed try_delete to delete and delete to delete_ok.
+- Renamed try_update to update and update to update_ok.
+
+Please take a look at [https://github.com/LHolten/rust-query/blob/main/CHANGELOG.md] for more.
