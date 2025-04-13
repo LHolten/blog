@@ -1,11 +1,9 @@
 +++
-title = "[Draft Post] Version 0.4 of rust-query is released!"
+title = "Version 0.4 of rust-query is released!"
 date = "2025-4-13"
 description = "rust-query 0.4 has many improvements described in this post"
 [taxonomies]
 tags = [ "database", "rust" ]
-[extra]
-hidden = true
 +++
 
 It has been more than 4 months since I first [wrote](/rust-query-announcement) about [`rust-query`]((https://github.com/LHolten/rust-query)), the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
