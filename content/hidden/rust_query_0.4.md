@@ -8,7 +8,7 @@ tags = [ "database", "rust" ]
 hidden = true
 +++
 
-It has been more than 4 months since I first [wrote about](/rust-query-announcement) `rust-query`, the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
+It has been more than 4 months since I first [wrote](/rust-query-announcement) about [`rust-query`]((https://github.com/LHolten/rust-query)), the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
 
 To show the new features, I will set the stage by defining a schema:
 ```rust
@@ -31,7 +31,7 @@ use v0::*;
 This syntax is slightly different from `rust-query 0.3`; the module of structs is much closer to the actual output of the `schema` macro. You can think of the whole `vN` module as a template for the modules that the macro generates. The generated modules have names `v0`, `v1` etc, depending on the version range specified.
 
 Now that we have a schema to play with, let us compare the old and new approach to retrieving some data.
-First, this is how you would retrieve data in `rust-query 0.3`.
+First, this is how you could already retrieve data since `rust-query 0.3`.
 ```rust
 #[derive(Select)]
 struct Score {
@@ -80,19 +80,19 @@ fn read_scores(txn: &Transaction<Schema>) -> Vec<Measurement!(score, timestamp)>
     })
 }
 ```
-The `Score` struct is completely gone! All that is left is the return type of the function, which now specifies the columns that will be retrieved from the database. This featurs is what I will call "structural types".
+The `Score` struct is completely gone! All that is left is the return type of the function, which now specifies the columns that will be retrieved from the database. This featurs is what I call "structural types" for lack of a better name.
 
 ## Structural Types
 
 For every table type like `Measurement`, there is a macro with the same name.
 This macro allows you to create a type to select a subset of columns in that table.
 For example, it is possible to write `Measurement!(score, timestamp)` and that will specify the
-`Measurement` type with only those two columns filled in.
+`Measurement` type where only those two columns are usable.
 How it works is that the `Measurement` struct is actually generic over the type of each field and the macro
-expands to specify those generics. Fields that are not used will get the `()` type.
+expands to specify those generics. Fields that are not used will get the `()` (unit) type.
 
 It is also possible to override the type of a field with a different type that implements `FromExpr`.
-So for example it is possible to use `Measurement!(score, location as Location!(name))` to retrieve
+For example, it is possible to use `Measurement!(score, location as Location!(name))` to retrieve
 scores with the name of the location.
 The syntax is a bit weird because I wanted to make it concise and still let `rustfmt` format it.
 
@@ -228,7 +228,7 @@ That is why the `rows.avg` method return an expression with `Option` type.
 We only want to return `Some(Info)` if we have an average, so that is why we use the `optional` combinator. It allows us to use `row.and` with `row.then` to only construct `Info` when we have an average.
 
 ### Covariant Expressions
-`Expr` (or rather `Column` before it was renamed) used to be invariant in its lifetime. This fundamental property made it easy to separate scopes.
+`Expr` used to be invariant in its lifetime. This fundamental property made it easy to separate scopes.
 However, for the `optional` combinator to be practical, it must be possible to use any `Expr` from the outer scope in the inner scope. At the same time expressions created inside should be prevented from leaking outside.
 To support this use case, `Expr` is now covariant and all APIs that relied on the invariant lifetime have been updated.
 
