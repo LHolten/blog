@@ -6,7 +6,7 @@ description = "rust-query 0.4 has many improvements described in this post"
 tags = [ "database", "rust" ]
 +++
 
-It has been more than 4 months since I first [wrote](/rust-query-announcement) about [`rust-query`]((https://github.com/LHolten/rust-query)), the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
+It has been more than 4 months since I first [wrote](/rust-query-announcement) about [`rust-query`](https://github.com/LHolten/rust-query), the query builder for SQLite. Since then there have been a lot of changes. I am really excited about the state of things and I am looking forward to feedback from the Rust community!
 
 To show the new features, I will set the stage by defining a schema:
 ```rust
