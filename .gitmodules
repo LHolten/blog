@@ -1,6 +1,3 @@
-[submodule "highlight_themes/gruvbox"]
-	path = highlight_themes/gruvbox
-	url = https://github.com/subnut/gruvbox-tmTheme.git
 [submodule "themes/abridge"]
 	path = themes/abridge
 	url = https://github.com/jieiku/abridge.git
