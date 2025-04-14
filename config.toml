@@ -22,7 +22,6 @@ generate_feeds = true
 
 [markdown]
 highlight_code = true
-extra_syntaxes_and_themes = ["highlight_themes/gruvbox"]
 highlight_theme = "css"
 
 
