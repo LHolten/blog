@@ -1,0 +1,5 @@
+
+Sitemap: https://blog.lucasholten.com/sitemap.xml
+User-Agent: *
+Allow: /
+Host: https://blog.lucasholten.com
